@@ -10,11 +10,10 @@ use esp_hal::{
     time::Instant,
 };
 
-esp_bootloader_esp_idf::esp_app_desc!();
-
 use core::ptr::addr_of_mut;
-
 use defmt::println;
+
+esp_bootloader_esp_idf::esp_app_desc!();
 
 #[main]
 fn main() -> ! {

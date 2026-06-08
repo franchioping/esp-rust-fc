@@ -1,5 +1,6 @@
+use core::any::Any;
+
 use nalgebra as na;
-use std::any::Any;
 
 pub struct DroneState {
     rotation: na::Unit<na::Quaternion<f32>>,

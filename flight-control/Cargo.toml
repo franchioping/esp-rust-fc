@@ -1,5 +1,5 @@
 [package]
-name = "flight-control-loop"
+name = "flight-control"
 version = "0.1.0"
 edition = "2024"
 
@@ -7,4 +7,7 @@ edition = "2024"
 crate-type = ["lib"]
 
 [dependencies]
-nalgebra = { version = "0.34", features = ["libm"] }
+nalgebra = { version = "0.34", default-features = false, features = [
+	"libm",
+	"macros",
+] }

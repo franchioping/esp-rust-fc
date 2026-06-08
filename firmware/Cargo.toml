@@ -37,10 +37,8 @@ critical-section = "1.2.0"
 static_cell = "2.1.1"
 
 heapless = "0.9"
-# esp-hal-dshot = { version = "0.3.1", features = ["esp32s3"] }
 
-
-# drone_controller = { path = "../drone_controller" }
+flight-control = { path = "../flight-control" }
 
 [dev-dependencies]
 embedded-test = { version = "0.7.1", features = ["defmt"] }

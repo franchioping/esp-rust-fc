@@ -5,3 +5,7 @@ edition = "2024"
 
 [dependencies]
 flight-control = { path = "../flight-control", features = ["std"] }
+
+rapier3d = { version = "0.31", features = ["simd-stable"] }
+
+nalgebra = { version = "0.34" }

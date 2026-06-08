@@ -3,6 +3,7 @@ debug/
 target/
 target-sim/
 target-embed/
+target-cli/
 
 # Editor configuration
 .vscode/

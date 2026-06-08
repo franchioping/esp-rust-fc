@@ -8,14 +8,14 @@ pub enum InputMode {
 }
 
 pub struct Input {
-    mode: InputMode,
-    inp: na::Vector4<f32>,
+    pub mode: InputMode,
+    pub inp: na::Vector4<f32>,
 }
 
 pub struct DroneState {
-    rotation: na::Unit<na::Quaternion<f32>>,
-    angular_vel: na::Vector3<f32>,
-    time: f32,
+    pub rotation: na::Unit<na::Quaternion<f32>>,
+    pub angular_vel: na::Vector3<f32>,
+    pub time: f32,
 }
 
 pub struct MotorCharacteristics {
@@ -34,5 +34,7 @@ pub trait DroneController {
     fn as_mut_any(&mut self) -> &mut dyn Any;
 
     fn set_motor_characteristics(&mut self, _motor_characteristics: &MotorCharacteristics) {}
-    fn update(&mut self, state: &DroneState, input: &Input) -> [f32; 4];
+
+    fn set_input(&mut self, inp: &Input) {}
+    fn update(&mut self, state: &DroneState) -> [f32; 4];
 }

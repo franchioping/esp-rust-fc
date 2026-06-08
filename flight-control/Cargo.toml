@@ -11,3 +11,7 @@ nalgebra = { version = "0.34", default-features = false, features = [
 	"libm",
 	"macros",
 ] }
+
+[features]
+default = []
+std = []

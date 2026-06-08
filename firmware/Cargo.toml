@@ -1,6 +1,6 @@
 [package]
 edition = "2024"
-name = "esp-rust-fc"
+name = "firmware"
 rust-version = "1.93"
 version = "0.1.0"
 

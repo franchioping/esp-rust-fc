@@ -1,0 +1,7 @@
+[package]
+name = "flight-sim"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+flight-control = { path = "../flight-control", features = ["std"] }

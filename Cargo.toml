@@ -1,6 +1,6 @@
 [workspace]
 resolver = "3"
-members = ["firmware", "flight-control"]
+members = ["firmware", "flight-control", "flight-sim"]
 
 
 # For fine tuning these settings, please refer to https://doc.rust-lang.org/cargo/reference/profiles.html

@@ -671,22 +671,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "esp-rust-fc"
-version = "0.1.0"
-dependencies = [
- "critical-section",
- "defmt 1.1.0",
- "embedded-test",
- "esp-backtrace",
- "esp-bootloader-esp-idf",
- "esp-hal",
- "esp-println",
- "flight-control",
- "heapless 0.9.3",
- "static_cell",
-]
-
-[[package]]
 name = "esp-sync"
 version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -807,10 +791,33 @@ dependencies = [
 ]
 
 [[package]]
+name = "firmware"
+version = "0.1.0"
+dependencies = [
+ "critical-section",
+ "defmt 1.1.0",
+ "embedded-test",
+ "esp-backtrace",
+ "esp-bootloader-esp-idf",
+ "esp-hal",
+ "esp-println",
+ "flight-control",
+ "heapless 0.9.3",
+ "static_cell",
+]
+
+[[package]]
 name = "flight-control"
 version = "0.1.0"
 dependencies = [
  "nalgebra",
+]
+
+[[package]]
+name = "flight-sim"
+version = "0.1.0"
+dependencies = [
+ "flight-control",
 ]
 
 [[package]]

@@ -1,3 +1,0 @@
-[submodule "drone_controller"]
-	path = drone_controller
-	url = https://github.com/atlasat-2026/drone_controller

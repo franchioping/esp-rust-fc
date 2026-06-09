@@ -12,6 +12,7 @@ pub struct Drone {
     pub rb_handle: rp::RigidBodyHandle,
     pub controller: Box<dyn DroneController>,
     pub current_throttles: [f32; 4],
+    pub last_torque: na::Vector3<f32>,
 
     motor_characteristics: MotorCharacteristics,
     width: f32,
@@ -75,6 +76,7 @@ impl Drone {
             last_time: world.get_time(),
             linvel: na::Vector3::zeros(),
             accel: na::Vector3::zeros(),
+            last_torque: na::Vector3::zeros(),
         };
     }
 
@@ -139,6 +141,7 @@ impl Drone {
             } else {
                 rp::vector![0.0, 0.0, -torque]
             };
+            self.last_torque = torque;
             drone_rb.add_torque(drone_rb.rotation().transform_vector(&torque), true);
         }
     }

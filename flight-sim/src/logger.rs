@@ -17,7 +17,7 @@ pub struct ControllerLogRowDef {
     sens_angular_velocty: na::Vector3<f32>,
     sens_rotation: na::Vector3<f32>,
 
-    target_motors: na::Vector4<f32>,
+    target_motors: [f32; 4],
     target_torque: na::Vector3<f32>,
     target_angular_velocty: na::Vector3<f32>,
     target_rotation: na::Vector3<f32>,
@@ -25,15 +25,15 @@ pub struct ControllerLogRowDef {
 
 #[derive(Clone, Copy, serde::Serialize, serde::Deserialize)]
 pub struct SimLogRow {
-    time: f32,
+    pub time: f32,
 
     #[serde(with = "ControllerLogRowDef")]
-    controller_log: ControllerLogRow,
+    pub controller_log: ControllerLogRow,
 
-    real_motors: na::Vector4<f32>,
-    real_torque: na::Vector3<f32>,
-    real_angular_velocty: na::Vector3<f32>,
-    real_rotation: na::Vector3<f32>,
+    pub real_motors: [f32; 4],
+    pub real_torque: na::Vector3<f32>,
+    pub real_angular_velocty: na::Vector3<f32>,
+    pub real_rotation: na::Vector3<f32>,
 }
 
 pub struct MsgPackSimLogger {

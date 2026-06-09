@@ -1,4 +1,8 @@
 
+clean:
+	rm -rf ./target*
+
+
 run-sim:
 	CARGO_TARGET_DIR="target-sim" \
 	cargo run -p flight-sim 
@@ -6,6 +10,15 @@ run-sim:
 build-sim:
 	CARGO_TARGET_DIR="target-sim" \
 	cargo build -p flight-sim 
+
+
+run-view:
+	CARGO_TARGET_DIR="target-view" \
+	cargo run -p telemetry-viewer 
+
+build-view:
+	CARGO_TARGET_DIR="target-view" \
+	cargo build -p telemetry-viewer 
 
 
 flash-fw:

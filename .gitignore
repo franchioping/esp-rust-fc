@@ -4,6 +4,7 @@ target/
 target-sim/
 target-embed/
 target-cli/
+target-view/
 
 # Editor configuration
 .vscode/

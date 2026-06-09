@@ -28,7 +28,7 @@ pub struct MotorCharacteristics {
     pub time_constant: f32,
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Default)]
 pub struct ControllerLogRow {
     pub time: f32,
 
@@ -37,7 +37,7 @@ pub struct ControllerLogRow {
     pub sens_angular_velocty: na::Vector3<f32>,
     pub sens_rotation: na::Vector3<f32>,
 
-    pub target_motors: na::Vector4<f32>,
+    pub target_motors: [f32; 4],
     pub target_torque: na::Vector3<f32>,
     pub target_angular_velocty: na::Vector3<f32>,
     pub target_rotation: na::Vector3<f32>,

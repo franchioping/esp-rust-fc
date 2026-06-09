@@ -53,6 +53,7 @@ impl InputRecording {
     pub fn has_ended(&self, time: f32) -> bool {
         return self.records.last().unwrap_or(&InputRecord::default()).time < time;
     }
+
     pub fn get_input(&self, time: f32) -> Input {
         /*
          * Binary search returns index to element as OK, or where the element could be placed to

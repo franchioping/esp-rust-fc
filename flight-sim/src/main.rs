@@ -1,5 +1,6 @@
 pub mod drone;
 pub mod input;
+pub mod logger;
 pub mod sim;
 pub mod world;
 

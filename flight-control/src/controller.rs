@@ -28,6 +28,21 @@ pub struct MotorCharacteristics {
     pub time_constant: f32,
 }
 
+#[derive(Clone, Copy)]
+pub struct ControllerLogRow {
+    pub time: f32,
+
+    pub input: Input,
+
+    pub sens_angular_velocty: na::Vector3<f32>,
+    pub sens_rotation: na::Vector3<f32>,
+
+    pub target_motors: na::Vector4<f32>,
+    pub target_torque: na::Vector3<f32>,
+    pub target_angular_velocty: na::Vector3<f32>,
+    pub target_rotation: na::Vector3<f32>,
+}
+
 pub trait DroneController {
     // Allow downcast of trait -> class.
     //
@@ -40,4 +55,6 @@ pub trait DroneController {
 
     fn set_input(&mut self, _inp: &Input) {}
     fn update(&mut self, state: &DroneState) -> [f32; 4];
+
+    fn get_last_log_row(&self) -> Option<ControllerLogRow>;
 }

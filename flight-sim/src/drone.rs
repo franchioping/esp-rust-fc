@@ -10,11 +10,13 @@ const DRAG_MAGIC_NUM: f32 = 0.00;
 
 pub struct Drone {
     pub rb_handle: rp::RigidBodyHandle,
-    motor_characteristics: MotorCharacteristics,
     pub controller: Box<dyn DroneController>,
+    pub current_throttles: [f32; 4],
+
+    motor_characteristics: MotorCharacteristics,
     width: f32,
     height: f32,
-    pub current_throttles: [f32; 4],
+
     target_throttles: [f32; 4],
     last_time: f32,
     linvel: na::Vector3<f32>,
@@ -108,10 +110,8 @@ impl Drone {
             .enumerate()
         {
             let target_throttle = throttles[i].clamp(0.0, 1.0);
-            // let alpha = (dt / self.motor_characteristics.time_constant).min(1.0); // Linear
 
             let alpha = 1.0 - (-dt / self.motor_characteristics.time_constant).exp(); // Exp
-                                                                                      // (Accurate)
 
             self.current_throttles[i] += (target_throttle - self.current_throttles[i]) * alpha;
 

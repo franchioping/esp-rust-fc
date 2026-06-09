@@ -3,24 +3,37 @@ use std::{fs::File, io::BufWriter};
 use nalgebra as na;
 
 use crate::input::InputDef;
+use flight_control::controller::ControllerLogRow;
 use flight_control::controller::Input;
 
 #[derive(Clone, Copy, serde::Serialize, serde::Deserialize)]
-pub struct SimLogRow {
+#[serde(remote = "ControllerLogRow")]
+pub struct ControllerLogRowDef {
     time: f32,
 
     #[serde(with = "InputDef")]
     input: Input,
 
-    motors: na::Vector4<f32>,
-    torque: na::Vector3<f32>,
-    angular_velocty: na::Vector3<f32>,
-    rotation: na::Vector3<f32>,
+    sens_angular_velocty: na::Vector3<f32>,
+    sens_rotation: na::Vector3<f32>,
 
     target_motors: na::Vector4<f32>,
     target_torque: na::Vector3<f32>,
     target_angular_velocty: na::Vector3<f32>,
     target_rotation: na::Vector3<f32>,
+}
+
+#[derive(Clone, Copy, serde::Serialize, serde::Deserialize)]
+pub struct SimLogRow {
+    time: f32,
+
+    #[serde(with = "ControllerLogRowDef")]
+    controller_log: ControllerLogRow,
+
+    real_motors: na::Vector4<f32>,
+    real_torque: na::Vector3<f32>,
+    real_angular_velocty: na::Vector3<f32>,
+    real_rotation: na::Vector3<f32>,
 }
 
 pub struct MsgPackSimLogger {

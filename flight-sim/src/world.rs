@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use nalgebra as na;
 use rapier3d::prelude::{self as rp, ColliderHandle};
 

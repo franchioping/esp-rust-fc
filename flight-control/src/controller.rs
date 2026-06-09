@@ -2,11 +2,14 @@ use core::any::Any;
 
 use nalgebra as na;
 
+#[derive(Clone, Copy, PartialEq, Eq, Default)]
 pub enum InputMode {
+    #[default]
     ACRO,
     LEVEL,
 }
 
+#[derive(Clone, Copy, PartialEq, Default)]
 pub struct Input {
     pub mode: InputMode,
     pub inp: na::Vector4<f32>,
@@ -35,6 +38,6 @@ pub trait DroneController {
 
     fn set_motor_characteristics(&mut self, _motor_characteristics: &MotorCharacteristics) {}
 
-    fn set_input(&mut self, inp: &Input) {}
+    fn set_input(&mut self, _inp: &Input) {}
     fn update(&mut self, state: &DroneState) -> [f32; 4];
 }

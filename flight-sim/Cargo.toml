@@ -8,4 +8,8 @@ flight-control = { path = "../flight-control", features = ["std"] }
 
 rapier3d = { version = "0.31", features = ["simd-stable"] }
 
-nalgebra = { version = "0.34" }
+nalgebra = { version = "0.34", features = ["serde-serialize"] }
+
+serde_with = "3.21.0"
+serde_json = "1.0.149"
+serde = { version = "1.0.228", features = ["serde_derive"] }

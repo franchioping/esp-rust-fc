@@ -1,0 +1,27 @@
+name: Rust
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Build sim
+      run: cargo build -p flight-sim --verbose
+    - name: Run tests on sim
+      run: cargo test -p flight-sim --verbose
+    - name: Build telem
+      run: cargo build -p telemetry-viewer --verbose
+    - name: Run tests on telem
+      run: cargo test -p telemetry-viewer --verbose
+

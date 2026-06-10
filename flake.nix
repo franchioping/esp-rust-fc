@@ -26,6 +26,13 @@
         let
           buildInputs = with pkgs;
             [
+              wayland
+              libx11
+              libxcursor
+              libxrandr
+              libxi
+              libxkbcommon
+              vulkan-loader
               esp-idf-full
               rustup
               openssl

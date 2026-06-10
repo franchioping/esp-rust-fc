@@ -19,7 +19,7 @@ pub struct Simulation {
     sim_data: Vec<SimLogRow>,
 }
 
-enum StepOutcome {
+pub enum StepOutcome {
     Continue,
     Exit,
 }
@@ -47,7 +47,7 @@ impl Simulation {
         Ok(())
     }
 
-    fn step(&mut self) -> Result<StepOutcome, Box<dyn Error>> {
+    pub fn step(&mut self) -> Result<StepOutcome, Box<dyn Error>> {
         self.world.step();
 
         let step_time = self.world.get_time();

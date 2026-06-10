@@ -15,6 +15,7 @@ pub struct Input {
     pub inp: na::Vector4<f32>,
 }
 
+#[derive(Clone, Copy)]
 pub struct DroneState {
     pub rotation: na::Unit<na::Quaternion<f32>>,
     pub angular_vel: na::Vector3<f32>,
@@ -57,4 +58,43 @@ pub trait DroneController {
     fn update(&mut self, state: &DroneState) -> [f32; 4];
 
     fn get_last_log_row(&self) -> Option<ControllerLogRow>;
+}
+
+pub struct SampleController {
+    log_row: ControllerLogRow,
+}
+
+impl SampleController {
+    pub fn new() -> Self {
+        Self {
+            log_row: Default::default(),
+        }
+    }
+}
+
+impl DroneController for SampleController {
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
+    fn as_mut_any(&mut self) -> &mut dyn Any {
+        self
+    }
+    fn update(&mut self, state: &DroneState) -> [f32; 4] {
+        let target: [f32; 4] = [
+            rand::random_range(-1.0..1.0),
+            rand::random_range(-1.0..1.0),
+            rand::random_range(-1.0..1.0),
+            rand::random_range(-1.0..1.0),
+        ];
+        self.log_row = ControllerLogRow {
+            time: state.time,
+            target_motors: target,
+            ..Default::default()
+        };
+
+        return target;
+    }
+    fn get_last_log_row(&self) -> Option<ControllerLogRow> {
+        Some(self.log_row)
+    }
 }

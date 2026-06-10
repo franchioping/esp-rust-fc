@@ -1,6 +1,6 @@
 
 clean:
-	rm -rf ./target*
+	rm -rf ./targe*
 
 
 run-sim:
@@ -14,6 +14,7 @@ build-sim:
 
 run-view:
 	CARGO_TARGET_DIR="target-view" \
+	WINIT_UNIX_BACKEND=x11 \
 	cargo run -p telemetry-viewer 
 
 build-view:

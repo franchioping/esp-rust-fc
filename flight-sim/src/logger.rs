@@ -37,7 +37,7 @@ pub struct SimLogRow {
 }
 
 pub struct MsgPackSimLogger {
-    file: File,
+    pub file: File,
 }
 
 impl SimLogger for MsgPackSimLogger {

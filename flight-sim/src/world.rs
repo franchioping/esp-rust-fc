@@ -23,7 +23,7 @@ impl World {
     pub fn new(dt: f32) -> Self {
         let gravity: na::Vector3<f32> = rp::vector![0.0, 0.0, -9.81];
         let mut integration_parameters = rp::IntegrationParameters::default();
-        integration_parameters.set_inv_dt(dt);
+        integration_parameters.set_inv_dt(1.0 / dt);
         let physics_pipeline = rp::PhysicsPipeline::new();
         let island_manager = rp::IslandManager::new();
         let broad_phase = rp::DefaultBroadPhase::new();

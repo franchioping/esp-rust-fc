@@ -141,7 +141,7 @@ impl Drone {
             } else {
                 rp::vector![0.0, 0.0, -torque]
             };
-            self.last_torque = torque;
+            self.last_torque = drone_rb.user_torque();
             drone_rb.add_torque(drone_rb.rotation().transform_vector(&torque), true);
         }
     }

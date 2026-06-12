@@ -75,6 +75,7 @@ impl Simulation {
             real_motors: self.drone.current_throttles,
             real_rotation: self.drone.get_rot(&self.world).scaled_axis(),
             real_angular_velocty: self.drone.get_angvel(&self.world),
+            real_angular_accel: self.drone.last_torque / self.drone.motor_characteristics.mass,
             real_torque: self.drone.last_torque,
         });
 

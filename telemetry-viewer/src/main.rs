@@ -2,15 +2,19 @@ use eframe::egui;
 use egui_plot::{Legend, Line, LineStyle, Plot, PlotItem, PlotPoints};
 use flight_sim::logger::SimLogRow;
 use std::collections::HashSet;
+use strum::IntoEnumIterator;
+use strum_macros::EnumIter;
 
-#[derive(Clone, Copy, PartialEq, Eq, Hash, Debug)]
+#[derive(Clone, Copy, PartialEq, Eq, Hash, Debug, EnumIter)]
 enum Vec3Field {
     SensAngularVelocity,
     SensRotation,
     TargetTorque,
+    TargetAngularAccel,
     TargetAngularVelocity,
     TargetRotation,
     RealTorque,
+    RealAngularAccel,
     RealAngularVelocity,
     RealRotation,
 }
@@ -21,9 +25,11 @@ impl Vec3Field {
             Self::SensAngularVelocity => "Sens Angular Velocity",
             Self::SensRotation => "Sens Rotation",
             Self::TargetTorque => "Target Torque",
+            Self::TargetAngularAccel => "Target Angular Accel",
             Self::TargetAngularVelocity => "Target Angular Velocity",
             Self::TargetRotation => "Target Rotation",
             Self::RealTorque => "Real Torque",
+            Self::RealAngularAccel => "Real Angular Accel",
             Self::RealAngularVelocity => "Real Angular Velocity",
             Self::RealRotation => "Real Rotation",
         }
@@ -39,6 +45,8 @@ impl Vec3Field {
             Self::RealTorque => &row.real_torque,
             Self::RealAngularVelocity => &row.real_angular_velocty,
             Self::RealRotation => &row.real_rotation,
+            Self::RealAngularAccel => &row.real_angular_accel,
+            Self::TargetAngularAccel => &row.controller_log.target_angular_accel,
         }
     }
 
@@ -55,18 +63,23 @@ impl Vec3Field {
                 LineStyle::dotted_dense(),
             ),
             Self::TargetTorque => (
+                egui::Color32::from_rgb(70, 70, 30),
+                LineStyle::dashed_loose(),
+            ),
+            Self::TargetAngularAccel => (
                 egui::Color32::from_rgb(70, 30, 30),
-                LineStyle::dashed_dense(),
+                LineStyle::dashed_loose(),
             ),
             Self::TargetAngularVelocity => (
                 egui::Color32::from_rgb(30, 70, 30),
-                LineStyle::dashed_dense(),
+                LineStyle::dashed_loose(),
             ),
             Self::TargetRotation => (
                 egui::Color32::from_rgb(30, 30, 70),
-                LineStyle::dashed_dense(),
+                LineStyle::dashed_loose(),
             ),
-            Self::RealTorque => (egui::Color32::from_rgb(70, 30, 30), LineStyle::Solid),
+            Self::RealTorque => (egui::Color32::from_rgb(70, 70, 30), LineStyle::Solid),
+            Self::RealAngularAccel => (egui::Color32::from_rgb(70, 30, 30), LineStyle::Solid),
             Self::RealAngularVelocity => (egui::Color32::from_rgb(30, 70, 30), LineStyle::Solid),
             Self::RealRotation => (egui::Color32::from_rgb(30, 30, 70), LineStyle::Solid),
         }
@@ -99,16 +112,7 @@ impl LogPlotterApp {
 
 impl eframe::App for LogPlotterApp {
     fn ui(&mut self, ui: &mut egui::Ui, _frame: &mut eframe::Frame) {
-        let all_fields = [
-            Vec3Field::SensAngularVelocity,
-            Vec3Field::SensRotation,
-            Vec3Field::TargetTorque,
-            Vec3Field::TargetAngularVelocity,
-            Vec3Field::TargetRotation,
-            Vec3Field::RealTorque,
-            Vec3Field::RealAngularVelocity,
-            Vec3Field::RealRotation,
-        ];
+        let all_fields = Vec3Field::iter();
 
         egui::Panel::left("plot_controls")
             .resizable(true)
@@ -121,15 +125,15 @@ impl eframe::App for LogPlotterApp {
 
                 // Use a ScrollArea in case your list of fields grows large
                 egui::ScrollArea::vertical()
-                    .max_height(200.0)
+                    .max_height(400.0)
                     .show(side_ui, |scroll_ui| {
-                        for field in &all_fields {
-                            let mut is_selected = self.selected_fields.contains(field);
+                        for field in all_fields {
+                            let mut is_selected = self.selected_fields.contains(&field);
                             if scroll_ui.checkbox(&mut is_selected, field.name()).changed() {
                                 if is_selected {
-                                    self.selected_fields.insert(*field);
+                                    self.selected_fields.insert(field);
                                 } else {
-                                    self.selected_fields.remove(field);
+                                    self.selected_fields.remove(&field);
                                 }
                             }
                         }

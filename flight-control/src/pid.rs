@@ -1,12 +1,12 @@
 use nalgebra as na;
 
 pub struct PidProcessor {
-    kp: na::Vector3<f32>,
-    ki: na::Vector3<f32>,
-    kd: na::Vector3<f32>,
-    kff: na::Vector3<f32>,
-    integral: na::Vector3<f32>,
-    last_error: na::Vector3<f32>,
+    pub kp: na::Vector3<f32>,
+    pub ki: na::Vector3<f32>,
+    pub kd: na::Vector3<f32>,
+    pub kff: na::Vector3<f32>,
+    pub integral: na::Vector3<f32>,
+    pub last_error: na::Vector3<f32>,
 }
 
 impl PidProcessor {

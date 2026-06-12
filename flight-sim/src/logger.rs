@@ -19,6 +19,7 @@ pub struct ControllerLogRowDef {
 
     target_motors: [f32; 4],
     target_torque: na::Vector3<f32>,
+    target_angular_accel: na::Vector3<f32>,
     target_angular_velocty: na::Vector3<f32>,
     target_rotation: na::Vector3<f32>,
 }
@@ -32,6 +33,7 @@ pub struct SimLogRow {
 
     pub real_motors: [f32; 4],
     pub real_torque: na::Vector3<f32>,
+    pub real_angular_accel: na::Vector3<f32>,
     pub real_angular_velocty: na::Vector3<f32>,
     pub real_rotation: na::Vector3<f32>,
 }

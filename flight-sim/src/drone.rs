@@ -14,7 +14,7 @@ pub struct Drone {
     pub current_throttles: [f32; 4],
     pub last_torque: na::Vector3<f32>,
 
-    motor_characteristics: MotorCharacteristics,
+    pub motor_characteristics: MotorCharacteristics,
     width: f32,
     height: f32,
 
@@ -33,7 +33,6 @@ impl Drone {
         world: &mut World,
         mut controller: Box<dyn DroneController>,
         motor_characteristics: MotorCharacteristics,
-        mass: f32,
     ) -> Drone {
         let drone_rb_handle = world.register_body(
             rp::RigidBodyBuilder::dynamic()
@@ -55,7 +54,7 @@ impl Drone {
         let height = 0.25;
         world.register_collider(
             rp::ColliderBuilder::cuboid(width / 2.0, height / 2.0, width / 2.0)
-                .mass(mass)
+                .mass(motor_characteristics.mass)
                 .restitution(0.3)
                 .build(),
             drone_rb_handle,
@@ -141,8 +140,9 @@ impl Drone {
             } else {
                 rp::vector![0.0, 0.0, -torque]
             };
-            self.last_torque = drone_rb.user_torque();
             drone_rb.add_torque(drone_rb.rotation().transform_vector(&torque), true);
+
+            self.last_torque = drone_rb.user_torque();
         }
     }
 

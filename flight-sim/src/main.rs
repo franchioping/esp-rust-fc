@@ -1,6 +1,8 @@
 use std::{error::Error, fs::File};
 
-use flight_control::controller::SampleController;
+use flight_control::{
+    controller::SampleController, mixer::MotorMixer, pid::PidProcessor, stacked::StackedController,
+};
 use nalgebra as na;
 
 use crate::{input::InputRecording, logger::MsgPackSimLogger};
@@ -28,19 +30,39 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     let drone = drone::Drone::new(
         &mut world,
-        Box::new(SampleController::new()),
+        Box::new(StackedController::new(
+            PidProcessor {
+                kp: na::vector![1.0, 0.0, 0.0],
+                ki: na::vector![0.0, 0.0, 0.0],
+                kd: na::vector![0.0, 0.0, 0.0],
+                kff: na::vector![0.0, 0.0, 0.0],
+                last_error: na::vector![0.0, 0.0, 0.0],
+                integral: na::vector![0.0, 0.0, 0.0],
+            },
+            MotorMixer {
+                motor_map: [
+                    [1.0, -1.0, 1.0],
+                    [-1.0, -1.0, -1.0],
+                    [-1.0, 1.0, 1.0],
+                    [1.0, 1.0, -1.0],
+                ],
+                min_throttle: 0.0,
+                max_throttle: 1.0,
+                mixing_mode: Default::default(),
+            },
+        )),
         flight_control::controller::MotorCharacteristics {
             relative_motor_positions: [
-                na::point![1.0, -1.0, 1.0],
-                na::point![-1.0, -1.0, -1.0],
-                na::point![-1.0, 1.0, 1.0],
-                na::point![1.0, 1.0, -1.0],
+                na::point![5.0, 5.0, 0.0],
+                na::point![5.0, -5.0, 0.0],
+                na::point![-5.0, -5.0, 0.0],
+                na::point![-5.0, 5.0, 0.0],
             ],
             max_thrust: 2.6,
             max_torque: 0.1,
             time_constant: 0.0,
+            mass: 0.5,
         },
-        0.5,
     );
 
     let mut sim = sim::Simulation::new(

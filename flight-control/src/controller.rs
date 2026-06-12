@@ -22,11 +22,24 @@ pub struct DroneState {
     pub time: f32,
 }
 
+#[derive(Clone, Copy, Default)]
 pub struct MotorCharacteristics {
     pub relative_motor_positions: [na::OPoint<f32, na::Const<3>>; 4],
     pub max_thrust: f32,
     pub max_torque: f32,
     pub time_constant: f32,
+    pub mass: f32,
+}
+
+impl MotorCharacteristics {
+    // this admits symetric motors.
+    pub fn max_torque(self) -> na::Vector3<f32> {
+        return na::vector![
+            4.0 * self.relative_motor_positions[0].x.abs() * self.max_thrust,
+            4.0 * self.relative_motor_positions[0].y.abs() * self.max_thrust,
+            4.0 * self.max_torque
+        ];
+    }
 }
 
 #[derive(Clone, Copy, Default)]
@@ -40,6 +53,7 @@ pub struct ControllerLogRow {
 
     pub target_motors: [f32; 4],
     pub target_torque: na::Vector3<f32>,
+    pub target_angular_accel: na::Vector3<f32>,
     pub target_angular_velocty: na::Vector3<f32>,
     pub target_rotation: na::Vector3<f32>,
 }
@@ -81,10 +95,10 @@ impl DroneController for SampleController {
     }
     fn update(&mut self, state: &DroneState) -> [f32; 4] {
         let target: [f32; 4] = [
-            rand::random_range(-1.0..1.0),
-            rand::random_range(-1.0..1.0),
-            rand::random_range(-1.0..1.0),
-            rand::random_range(-1.0..1.0),
+            rand::random_range(0.0..1.0),
+            rand::random_range(0.0..1.0),
+            rand::random_range(0.0..1.0),
+            rand::random_range(0.0..1.0),
         ];
         self.log_row = ControllerLogRow {
             time: state.time,

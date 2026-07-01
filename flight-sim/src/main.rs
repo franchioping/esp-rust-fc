@@ -32,8 +32,8 @@ fn main() -> Result<(), Box<dyn Error>> {
         &mut world,
         Box::new(StackedController::new(
             PidProcessor {
-                kp: na::vector![1.0, 0.0, 0.0],
-                ki: na::vector![0.0, 0.0, 0.0],
+                kp: na::vector![1.0, 1.0, 1.0],
+                ki: na::vector![0.0, 0.0, 0.1],
                 kd: na::vector![0.0, 0.0, 0.0],
                 kff: na::vector![0.0, 0.0, 0.0],
                 last_error: na::vector![0.0, 0.0, 0.0],

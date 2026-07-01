@@ -161,7 +161,8 @@ impl Drone {
     }
 
     pub fn get_angvel(&self, world: &World) -> na::Vector3<f32> {
-        *world.bodies.get(self.rb_handle).unwrap().angvel()
+        let rb = world.bodies.get(self.rb_handle).unwrap();
+        rb.rotation().inverse().transform_vector(&rb.angvel())
     }
 
     pub fn get_rb<'a>(&self, world: &'a World) -> &'a rp::RigidBody {

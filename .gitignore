@@ -6,6 +6,8 @@ target-embed/
 target-cli/
 target-view/
 
+run-data/
+
 # Editor configuration
 .vscode/
 .zed/

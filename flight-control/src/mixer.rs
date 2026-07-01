@@ -9,7 +9,7 @@ impl Default for MotorMixingMode {
     fn default() -> Self {
         Self::ThrottleAuthorityReasonable {
             min_scale: 0.10,
-            max_torque: 1.0,
+            max_torque: 1.8,
         }
     }
 }

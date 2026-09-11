@@ -17,7 +17,6 @@ pub struct Input {
 
 #[derive(Clone, Copy)]
 pub struct DroneState {
-    pub rotation: na::Unit<na::Quaternion<f32>>,
     pub angular_vel: na::Vector3<f32>,
     pub time: f32,
 }

@@ -4,3 +4,4 @@ pub mod controller;
 pub mod mixer;
 pub mod pid;
 pub mod stacked;
+pub mod fusion;

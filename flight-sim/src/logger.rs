@@ -36,6 +36,10 @@ pub struct SimLogRow {
     pub real_angular_accel: na::Vector3<f32>,
     pub real_angular_velocty: na::Vector3<f32>,
     pub real_rotation: na::Vector3<f32>,
+
+
+    pub noised_angular_velocty: na::Vector3<f32>,
+    pub noised_acceleration: na::Vector3<f32>,
 }
 
 pub struct MsgPackSimLogger {

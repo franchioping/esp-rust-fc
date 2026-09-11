@@ -7,6 +7,7 @@ pub enum MotorMixingMode {
 }
 impl Default for MotorMixingMode {
     fn default() -> Self {
+        // Self::MixModern
         Self::ThrottleAuthorityReasonable {
             min_scale: 0.10,
             max_torque: 1.8,
@@ -110,7 +111,7 @@ impl MotorMixer {
             motors[i] = lim_throttle + delta[i] * scale;
         }
 
-        let saturated = scale < 1.0;
+        let saturated = scale < 1.0 || delta_dif > throttle_range_len;
 
         (motors, saturated)
     }

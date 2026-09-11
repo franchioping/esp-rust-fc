@@ -1,15 +1,19 @@
 use std::{error::Error, fs::File};
 
-use flight_control::{
-    controller::SampleController, mixer::MotorMixer, pid::PidProcessor, stacked::StackedController,
-};
-use nalgebra as na;
+use flight_control::fusion::*;
+use flight_control::{mixer::MotorMixer, pid::PidProcessor, stacked::StackedController};
 
+use nalgebra as na;
+use rand_distr::Normal;
+
+use crate::drone::SensorCharacteristics;
+use crate::sens::SensorErrorParams;
 use crate::{input::InputRecording, logger::MsgPackSimLogger};
 
 pub mod drone;
 pub mod input;
 pub mod logger;
+pub mod sens;
 pub mod sim;
 pub mod world;
 
@@ -22,7 +26,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             n as f32 * 0.2,
             flight_control::controller::Input {
                 mode: flight_control::controller::InputMode::ACRO,
-                inp: na::vector![n as f32, n as f32 * 2.0, n as f32 / 2.0, 1.0],
+                inp: na::vector![n as f32, n as f32 * 2.0, n as f32 / 2.0, 0.5],
             },
         );
     }
@@ -51,6 +55,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                 mixing_mode: Default::default(),
             },
         )),
+        Box::new(AngvelNoFiltering {}),
         flight_control::controller::MotorCharacteristics {
             relative_motor_positions: [
                 na::point![5.0, 5.0, 0.0],
@@ -63,12 +68,24 @@ fn main() -> Result<(), Box<dyn Error>> {
             time_constant: 0.0,
             mass: 0.5,
         },
+        SensorCharacteristics {
+            gyro_error_params: SensorErrorParams {
+                bias: na::Vector3::<f32>::zeros(),
+                bias_drift_rate: na::Vector3::<f32>::zeros(),
+                scale_factors: na::vector![1.0, 1.0, 1.0],
+                cross_talk: na::Matrix3::zeros(),
+                random_noise_distrib: Normal::new(0.0, 0.1).unwrap(),
+                resolution: 0.1,
+            },
+
+            accel_error_params: Default::default(),
+        },
     );
 
     let mut sim = sim::Simulation::new(
         drone,
         world,
-        100,
+        1000,
         Box::new(MsgPackSimLogger {
             file: File::create("./run-data/test.idfk")?,
         }),

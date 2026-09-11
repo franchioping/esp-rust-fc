@@ -1,7 +1,5 @@
 use std::error::Error;
 
-use flight_control::controller::Input;
-use nalgebra as na;
 
 use crate::drone::Drone;
 use crate::input::InputRecording;
@@ -55,15 +53,17 @@ impl Simulation {
             return Ok(StepOutcome::Exit);
         }
 
-        let current_input = self.input_recording.get_input(self.world.get_time());
         if self.world.tick
             % ((self.world.integration_parameters.inv_dt() / self.drone_tick_rate as f32) as u64)
             == 0
         {
-            self.drone
-                .process_controller_tick(&mut self.world, &current_input);
+            let current_input = self.input_recording.get_input(self.world.get_time());
+
+            self.drone.controller.set_input(&current_input);
+            self.drone.process_tick(&mut self.world, true);
+        } else {
+            self.drone.process_tick(&mut self.world, false);
         }
-        self.drone.process_tick(&mut self.world);
 
         self.sim_data.push(SimLogRow {
             time: step_time,
@@ -77,6 +77,8 @@ impl Simulation {
             real_angular_velocty: self.drone.get_angvel(&self.world),
             real_angular_accel: self.drone.last_torque / self.drone.motor_characteristics.mass,
             real_torque: self.drone.last_torque,
+            noised_angular_velocty: self.drone.last_sensor_state.angular_vel_unfiltered,
+            noised_acceleration: self.drone.last_sensor_state.linear_acceleration_unfiltered,
         });
 
         Ok(StepOutcome::Continue)

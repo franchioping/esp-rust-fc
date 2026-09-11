@@ -1,6 +1,9 @@
 use flight_control::controller::*;
+use flight_control::fusion::*;
 use nalgebra::{self as na, Vector3};
 use rapier3d::prelude as rp;
+
+use crate::sens::SensorErrorParams;
 
 use crate::world::World;
 
@@ -8,13 +11,21 @@ const AIR_DENSITY: f32 = 1.23;
 const DRAG_CONSTANT: f32 = 1.3;
 const DRAG_MAGIC_NUM: f32 = 0.00;
 
+pub struct SensorCharacteristics {
+    pub accel_error_params: SensorErrorParams,
+    pub gyro_error_params: SensorErrorParams,
+}
+
 pub struct Drone {
     pub rb_handle: rp::RigidBodyHandle,
     pub controller: Box<dyn DroneController>,
+    pub fusion: Box<dyn SensFusion>,
     pub current_throttles: [f32; 4],
     pub last_torque: na::Vector3<f32>,
+    pub last_sensor_state: SensorState,
 
     pub motor_characteristics: MotorCharacteristics,
+    pub sensor_characteristics: SensorCharacteristics,
     width: f32,
     height: f32,
 
@@ -32,15 +43,16 @@ impl Drone {
     pub fn new(
         world: &mut World,
         mut controller: Box<dyn DroneController>,
+        fusion: Box<dyn SensFusion>,
         motor_characteristics: MotorCharacteristics,
+        sensor_characteristics: SensorCharacteristics,
     ) -> Drone {
         let drone_rb_handle = world.register_body(
             rp::RigidBodyBuilder::dynamic()
                 .translation(rp::vector![0.0, 0.0, 10.0])
                 .rotation(rp::vector![0.0, 0.0, 0.0])
                 /*
-                 * These damping values keep the simulation more realistic,
-                 * They act as air resistance
+                 * These damping values keep the simulation more realistic, They act as air resistance
                  *
                  * Values are kind of random for now. Calculating them requires the final model
                  * A Poor Man's fluid simulation :D
@@ -67,7 +79,9 @@ impl Drone {
         return Drone {
             rb_handle: drone_rb_handle,
             controller: controller,
-            motor_characteristics: motor_characteristics,
+            motor_characteristics,
+            sensor_characteristics,
+            fusion,
             width,
             height,
             current_throttles: [0.0; 4],
@@ -76,6 +90,7 @@ impl Drone {
             linvel: na::Vector3::zeros(),
             accel: na::Vector3::zeros(),
             last_torque: na::Vector3::zeros(),
+            last_sensor_state: Default::default()
         };
     }
 
@@ -146,14 +161,21 @@ impl Drone {
         }
     }
 
-    fn update_controller(&mut self, world: &World) {
+    fn update_controller(&mut self, world: &World, dt: f32) {
         let rb = world.bodies.get(self.rb_handle).unwrap();
 
-        self.target_throttles = self.controller.update(&DroneState {
-            rotation: *rb.rotation(),
-            angular_vel: rb.rotation().inverse().transform_vector(&rb.angvel()),
+        let mut sensors_state = SensorState {
+            linear_acceleration_unfiltered:  rb.rotation().inverse().transform_vector(&self.accel),
+            angular_vel_unfiltered: rb.rotation().inverse().transform_vector(&rb.angvel()),
             time: world.get_time(),
-        });
+        };
+
+        self.sensor_characteristics.accel_error_params.apply_error(&mut sensors_state.linear_acceleration_unfiltered, dt);
+        self.sensor_characteristics.gyro_error_params.apply_error(&mut sensors_state.angular_vel_unfiltered, dt);
+
+        self.last_sensor_state = sensors_state;
+
+        self.target_throttles = self.controller.update(&self.fusion.fuse(&sensors_state));
     }
 
     pub fn get_accel(&self) -> na::Vector3<f32> {
@@ -172,17 +194,19 @@ impl Drone {
         *world.bodies.get(self.rb_handle).unwrap().rotation()
     }
 
-    pub fn process_controller_tick(&mut self, world: &mut World, inp: &Input) {
-        self.controller.set_input(inp);
-        self.update_controller(world);
-    }
 
-    pub fn process_tick(&mut self, world: &mut World) {
-        self.apply_throttles(world, world.get_time() - self.last_time);
+    pub fn process_tick(&mut self, world: &mut World, update_controller: bool) {
+        let dt =  world.get_time() - self.last_time;
+        self.apply_throttles(world, dt);
         self.apply_drag(world);
 
         let cur_linvel = self.get_rb(world).linvel();
         self.accel = (cur_linvel - self.linvel) / (world.get_time() - self.last_time);
+
+        if update_controller {
+            self.update_controller(world, dt);
+        }
+
         self.linvel = *cur_linvel;
         self.last_time = world.get_time();
     }

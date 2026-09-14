@@ -1,6 +1,5 @@
 use std::error::Error;
 
-
 use crate::drone::Drone;
 use crate::input::InputRecording;
 use crate::logger::{SimLogRow, SimLogger};

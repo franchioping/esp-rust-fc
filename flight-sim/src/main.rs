@@ -36,8 +36,8 @@ fn main() -> Result<(), Box<dyn Error>> {
         &mut world,
         Box::new(StackedController::new(
             PidProcessor {
-                kp: na::vector![1.0, 1.0, 1.0],
-                ki: na::vector![0.0, 0.0, 0.1],
+                kp: na::vector![2.0, 2.0, 2.0],
+                ki: na::vector![0.1, 0.1, 0.1],
                 kd: na::vector![0.0, 0.0, 0.0],
                 kff: na::vector![0.0, 0.0, 0.0],
                 last_error: na::vector![0.0, 0.0, 0.0],
@@ -75,7 +75,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                 scale_factors: na::vector![1.0, 1.0, 1.0],
                 cross_talk: na::Matrix3::zeros(),
                 random_noise_distrib: Normal::new(0.0, 0.1).unwrap(),
-                resolution: 0.1,
+                resolution: 0.01,
             },
 
             accel_error_params: Default::default(),

@@ -18,7 +18,6 @@ enum Vec3Field {
     RealAngularVelocity,
     RealRotation,
 
-
     NoisedAngularVelocity,
 }
 
@@ -35,7 +34,6 @@ impl Vec3Field {
             Self::RealAngularAccel => "Real Angular Accel",
             Self::RealAngularVelocity => "Real Angular Velocity",
             Self::RealRotation => "Real Rotation",
-
 
             Self::NoisedAngularVelocity => "Noised Angular Velocity",
         }
@@ -90,11 +88,7 @@ impl Vec3Field {
             Self::RealAngularVelocity => (egui::Color32::from_rgb(30, 70, 30), LineStyle::Solid),
             Self::RealRotation => (egui::Color32::from_rgb(30, 30, 70), LineStyle::Solid),
 
-
-            Self::NoisedAngularVelocity=> (
-                egui::Color32::from_rgb(30, 45, 30),
-                LineStyle::Solid,
-            ),
+            Self::NoisedAngularVelocity => (egui::Color32::from_rgb(30, 45, 30), LineStyle::Solid),
         }
     }
 }

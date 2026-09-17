@@ -18,19 +18,17 @@ pub mod sim;
 pub mod world;
 
 fn main() -> Result<(), Box<dyn Error>> {
-    let mut world = world::World::new(1.0 / 6000.0);
+    let mut world = world::World::new(1.0 / 10000.0);
 
-    let mut inp_recording: InputRecording = Default::default();
-    for n in 0..10 {
-        inp_recording.add_input(
-            n as f32 * 0.2,
-            flight_control::controller::Input {
-                mode: flight_control::controller::InputMode::ACRO,
-                inp: na::vector![n as f32, n as f32 * 2.0, n as f32 / 2.0, 0.5],
-            },
-        );
-    }
-    inp_recording.save_to_file("./run-data/rec.json")?;
+    // let mut inp_recording: InputRecording = Default::default(); for n in 0..10 { inp_recording.add_input(
+    //         n as f32 * 0.2,
+    //         flight_control::controller::Input {
+    //             mode: flight_control::controller::InputMode::ACRO,
+    //             inp: na::vector![n as f32, n as f32 * 2.0, n as f32 / 2.0, 1.0],
+    //         },
+    //     );
+    // }
+    // inp_recording.save_to_file("./run-data/rec.json")?;
 
     let drone = drone::Drone::new(
         &mut world,
@@ -67,6 +65,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             max_torque: 0.1,
             time_constant: 0.0,
             mass: 0.5,
+            resonance_throttle_coeff: 20000.0 / 60.0 * 3.0, // approximately RPM / 60.0 * prop_count
         },
         SensorCharacteristics {
             gyro_error_params: SensorErrorParams {
@@ -74,8 +73,9 @@ fn main() -> Result<(), Box<dyn Error>> {
                 bias_drift_rate: na::Vector3::<f32>::zeros(),
                 scale_factors: na::vector![1.0, 1.0, 1.0],
                 cross_talk: na::Matrix3::zeros(),
-                random_noise_distrib: Normal::new(0.0, 0.1).unwrap(),
-                resolution: 0.01,
+                random_noise_distrib: Normal::new(0.0, 0.0).unwrap(),
+                resolution: 0.0005,
+                ..Default::default()
             },
 
             accel_error_params: Default::default(),
@@ -85,7 +85,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let mut sim = sim::Simulation::new(
         drone,
         world,
-        1000,
+        10000,
         Box::new(MsgPackSimLogger {
             file: File::create("./run-data/test.idfk")?,
         }),

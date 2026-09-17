@@ -1,6 +1,15 @@
+use core::{f32, f64};
+
+use flight_control::controller::MotorCharacteristics;
 use nalgebra::{self as na};
 
 use rand_distr::{Distribution, Normal};
+
+#[derive(Default, Debug, Clone)]
+
+pub struct SensorErrorState {
+    pub motor_phases: [f64; 4],
+}
 
 #[derive(Debug, Clone)]
 pub struct SensorErrorParams {
@@ -26,6 +35,7 @@ pub struct SensorErrorParams {
 
     // Quantization
     pub resolution: f32,
+    pub state: SensorErrorState,
 }
 
 impl Default for SensorErrorParams {
@@ -37,6 +47,7 @@ impl Default for SensorErrorParams {
             cross_talk: na::Matrix3::zeros(),
             random_noise_distrib: Normal::new(0.0, 0.0).unwrap(),
             resolution: 0.0001,
+            state: Default::default(),
         }
     }
 }
@@ -56,7 +67,14 @@ impl SensorErrorParams {
         self.bias += drift;
     }
 
-    pub fn apply_error(&mut self, sensor_read: &mut na::Vector3<f32>, dt: f32) {
+    pub fn apply_error(
+        &mut self,
+        sensor_read: &mut na::Vector3<f32>,
+        dt: f32,
+        time: f32,
+        motor_characteristics: &MotorCharacteristics,
+        throttles: &[f32; 4],
+    ) {
         self.update_bias_drift(dt, &mut rand::rng());
 
         *sensor_read += self.bias;
@@ -72,6 +90,23 @@ impl SensorErrorParams {
 
         for i in 0..=2 {
             sensor_read[i] += self.random_noise_distrib.sample(&mut rand::rng());
+        }
+
+        let resonace_strenght = 0.005;
+        for motor in 0..throttles.len() {
+            let freq = motor_characteristics.resonance_throttle_coeff * throttles[motor];
+
+            self.state.motor_phases[motor] += (freq * dt) as f64 * 2.0 * f64::consts::PI;
+
+            self.state.motor_phases[motor] =
+                self.state.motor_phases[motor] % (2.0 * f64::consts::PI);
+
+            for axis in 0..=2 {
+                sensor_read[axis] += (self.state.motor_phases[motor]).sin() as f32
+                    * 0.25
+                    * throttles[motor]
+                    * resonace_strenght;
+            }
         }
 
         for i in 0..=2 {

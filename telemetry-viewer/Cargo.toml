@@ -19,3 +19,4 @@ egui = "0.34.3"
 
 strum = "0.28"
 strum_macros = "0.28"
+phastft = "0.4.1"

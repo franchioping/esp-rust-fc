@@ -31,6 +31,7 @@ pub struct Drone {
 
     target_throttles: [f32; 4],
     last_time: f32,
+    last_time_update_controller: f32,
     linvel: na::Vector3<f32>,
     accel: na::Vector3<f32>,
 }
@@ -87,10 +88,11 @@ impl Drone {
             current_throttles: [0.0; 4],
             target_throttles: [0.0; 4],
             last_time: world.get_time(),
+            last_time_update_controller: world.get_time(),
             linvel: na::Vector3::zeros(),
             accel: na::Vector3::zeros(),
             last_torque: na::Vector3::zeros(),
-            last_sensor_state: Default::default()
+            last_sensor_state: Default::default(),
         };
     }
 
@@ -165,13 +167,25 @@ impl Drone {
         let rb = world.bodies.get(self.rb_handle).unwrap();
 
         let mut sensors_state = SensorState {
-            linear_acceleration_unfiltered:  rb.rotation().inverse().transform_vector(&self.accel),
+            linear_acceleration_unfiltered: rb.rotation().inverse().transform_vector(&self.accel),
             angular_vel_unfiltered: rb.rotation().inverse().transform_vector(&rb.angvel()),
             time: world.get_time(),
         };
 
-        self.sensor_characteristics.accel_error_params.apply_error(&mut sensors_state.linear_acceleration_unfiltered, dt);
-        self.sensor_characteristics.gyro_error_params.apply_error(&mut sensors_state.angular_vel_unfiltered, dt);
+        self.sensor_characteristics.accel_error_params.apply_error(
+            &mut sensors_state.linear_acceleration_unfiltered,
+            dt,
+            world.get_time(),
+            &self.motor_characteristics,
+            &self.current_throttles,
+        );
+        self.sensor_characteristics.gyro_error_params.apply_error(
+            &mut sensors_state.angular_vel_unfiltered,
+            dt,
+            world.get_time(),
+            &self.motor_characteristics,
+            &self.current_throttles,
+        );
 
         self.last_sensor_state = sensors_state;
 
@@ -194,9 +208,8 @@ impl Drone {
         *world.bodies.get(self.rb_handle).unwrap().rotation()
     }
 
-
     pub fn process_tick(&mut self, world: &mut World, update_controller: bool) {
-        let dt =  world.get_time() - self.last_time;
+        let dt = world.get_time() - self.last_time;
         self.apply_throttles(world, dt);
         self.apply_drag(world);
 
@@ -204,7 +217,8 @@ impl Drone {
         self.accel = (cur_linvel - self.linvel) / (world.get_time() - self.last_time);
 
         if update_controller {
-            self.update_controller(world, dt);
+            self.update_controller(world, world.get_time() - self.last_time_update_controller);
+            self.last_time_update_controller = world.get_time()
         }
 
         self.linvel = *cur_linvel;

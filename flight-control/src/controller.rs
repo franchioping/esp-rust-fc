@@ -28,6 +28,8 @@ pub struct MotorCharacteristics {
     pub max_torque: f32,
     pub time_constant: f32,
     pub mass: f32,
+
+    pub resonance_throttle_coeff: f32,
 }
 
 impl MotorCharacteristics {
